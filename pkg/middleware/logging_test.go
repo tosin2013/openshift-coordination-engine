@@ -21,7 +21,7 @@ func TestRequestLogger(t *testing.T) {
 	middleware := RequestLogger(log)
 	wrappedHandler := middleware(handler)
 
-	req := httptest.NewRequest("GET", "/test", nil)
+	req := httptest.NewRequest("GET", "/test", http.NoBody)
 	rr := httptest.NewRecorder()
 
 	wrappedHandler.ServeHTTP(rr, req)
@@ -41,7 +41,7 @@ func TestRequestLogger_WithRequestID(t *testing.T) {
 	middleware := RequestLogger(log)
 	wrappedHandler := middleware(handler)
 
-	req := httptest.NewRequest("GET", "/test", nil)
+	req := httptest.NewRequest("GET", "/test", http.NoBody)
 	req.Header.Set(RequestIDHeader, "test-request-id")
 	rr := httptest.NewRecorder()
 
@@ -74,7 +74,7 @@ func TestRequestLogger_StatusCode(t *testing.T) {
 			middleware := RequestLogger(log)
 			wrappedHandler := middleware(handler)
 
-			req := httptest.NewRequest("GET", "/test", nil)
+			req := httptest.NewRequest("GET", "/test", http.NoBody)
 			rr := httptest.NewRecorder()
 
 			wrappedHandler.ServeHTTP(rr, req)

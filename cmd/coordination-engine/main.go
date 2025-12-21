@@ -154,7 +154,7 @@ func main() {
 		log,
 	)
 	log.Info("Multi-layer orchestrator initialized with remediation integration")
-	
+
 	// Setup HTTP router with middleware
 	router := mux.NewRouter()
 
@@ -213,7 +213,7 @@ func main() {
 		WriteTimeout: 15 * time.Second,
 		IdleTimeout:  60 * time.Second,
 	}
-	
+
 	// Start server in goroutine
 	go func() {
 		log.WithField("port", cfg.Port).Info("Starting API server")
@@ -221,26 +221,26 @@ func main() {
 			log.WithError(err).Fatal("API server failed")
 		}
 	}()
-	
+
 	// Wait for interrupt signal
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
-	
+
 	log.Info("Shutting down servers...")
-	
+
 	// Graceful shutdown
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	
+
 	if err := server.Shutdown(ctx); err != nil {
 		log.WithError(err).Error("API server shutdown error")
 	}
-	
+
 	if err := metricsServer.Shutdown(ctx); err != nil {
 		log.WithError(err).Error("Metrics server shutdown error")
 	}
-	
+
 	log.Info("Servers stopped")
 }
 
@@ -304,4 +304,3 @@ func initKubernetesClient(cfg *config.Config, log *logrus.Logger) (*KubernetesCl
 		Config:        restConfig,
 	}, nil
 }
-

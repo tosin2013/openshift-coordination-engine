@@ -8,8 +8,8 @@ import (
 // Issue represents a problem requiring remediation
 type Issue struct {
 	ID           string    `json:"id"`
-	Type         string    `json:"type"`         // "CrashLoopBackOff", "ImagePullBackOff", etc.
-	Severity     string    `json:"severity"`     // "low", "medium", "high", "critical"
+	Type         string    `json:"type"`     // "CrashLoopBackOff", "ImagePullBackOff", etc.
+	Severity     string    `json:"severity"` // "low", "medium", "high", "critical"
 	Namespace    string    `json:"namespace"`
 	ResourceType string    `json:"resource_type"` // "pod", "deployment", "statefulset"
 	ResourceName string    `json:"resource_name"`

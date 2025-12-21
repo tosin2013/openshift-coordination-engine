@@ -37,12 +37,12 @@ type DependencyHealth struct {
 
 // RBACStatus represents RBAC permission check status
 type RBACStatus struct {
-	Status           ComponentStatus `json:"status"`
-	PermissionsTotal int             `json:"permissions_total"`
-	PermissionsOK    int             `json:"permissions_ok"`
-	PermissionsFailed int            `json:"permissions_failed"`
-	CriticalOK       bool            `json:"critical_ok"`
-	Message          string          `json:"message,omitempty"`
+	Status            ComponentStatus `json:"status"`
+	PermissionsTotal  int             `json:"permissions_total"`
+	PermissionsOK     int             `json:"permissions_ok"`
+	PermissionsFailed int             `json:"permissions_failed"`
+	CriticalOK        bool            `json:"critical_ok"`
+	Message           string          `json:"message,omitempty"`
 }
 
 // HealthResponse represents the comprehensive health check response
@@ -69,8 +69,8 @@ func NewHealthResponse(version string, startTime time.Time) *HealthResponse {
 }
 
 // AddDependency adds a dependency health check result
-func (h *HealthResponse) AddDependency(name string, dep DependencyHealth) {
-	h.Dependencies[name] = dep
+func (h *HealthResponse) AddDependency(name string, dep *DependencyHealth) {
+	h.Dependencies[name] = *dep
 
 	// Update overall status based on dependency status
 	if dep.Status == ComponentStatusDown {

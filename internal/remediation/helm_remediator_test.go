@@ -107,11 +107,11 @@ func TestHelmRemediator_RemediateValidation(t *testing.T) {
 	remediator := NewHelmRemediator(log)
 
 	tests := []struct {
-		name          string
+		name           string
 		deploymentInfo *models.DeploymentInfo
-		issue         *models.Issue
-		expectError   bool
-		errorContains string
+		issue          *models.Issue
+		expectError    bool
+		errorContains  string
 	}{
 		{
 			name: "Missing release_name",

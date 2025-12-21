@@ -3,6 +3,7 @@ package remediation
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os/exec"
 	"time"
@@ -22,7 +23,7 @@ type HelmStatus struct {
 	Name      string `json:"name"`
 	Namespace string `json:"namespace"`
 	Info      struct {
-		Status     string    `json:"status"`
+		Status        string    `json:"status"`
 		FirstDeployed time.Time `json:"first_deployed"`
 		LastDeployed  time.Time `json:"last_deployed"`
 		Description   string    `json:"description"`
@@ -53,11 +54,11 @@ func (hr *HelmRemediator) Remediate(ctx context.Context, deploymentInfo *models.
 	}
 
 	hr.log.WithFields(logrus.Fields{
-		"release":      releaseName,
-		"namespace":    releaseNamespace,
-		"issue_type":   issue.Type,
-		"resource":     issue.ResourceName,
-		"method":       "helm",
+		"release":    releaseName,
+		"namespace":  releaseNamespace,
+		"issue_type": issue.Type,
+		"resource":   issue.ResourceName,
+		"method":     "helm",
 	}).Info("Starting Helm remediation")
 
 	// Check release status
@@ -101,7 +102,7 @@ func (hr *HelmRemediator) Remediate(ctx context.Context, deploymentInfo *models.
 		// If upgrade fails, attempt rollback as safety measure
 		hr.log.WithError(err).Warn("Helm upgrade failed, attempting rollback")
 		if rollbackErr := hr.rollbackRelease(ctx, releaseName, releaseNamespace); rollbackErr != nil {
-			return fmt.Errorf("helm upgrade failed: %w, and rollback also failed: %v", err, rollbackErr)
+			return fmt.Errorf("helm upgrade failed: %w, and rollback also failed: %w", err, rollbackErr)
 		}
 		return fmt.Errorf("helm upgrade failed (rolled back): %w", err)
 	}
@@ -140,7 +141,8 @@ func (hr *HelmRemediator) getReleaseStatus(ctx context.Context, releaseName, nam
 	output, err := cmd.Output()
 	if err != nil {
 		// Check if release exists
-		if exitErr, ok := err.(*exec.ExitError); ok {
+		var exitErr *exec.ExitError
+		if errors.As(err, &exitErr) {
 			hr.log.WithFields(logrus.Fields{
 				"release":  releaseName,
 				"stderr":   string(exitErr.Stderr),

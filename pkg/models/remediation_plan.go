@@ -7,13 +7,13 @@ import (
 
 // RemediationStep represents a single remediation action in a multi-layer plan
 type RemediationStep struct {
-	Layer       Layer         `json:"layer"`
-	Order       int           `json:"order"`
-	Description string        `json:"description"`
-	ActionType  string        `json:"action_type"` // restart, rollback, scale, drain, etc.
-	Target      string        `json:"target"`      // Resource identifier
-	WaitTime    time.Duration `json:"wait_time"`   // Time to wait after this step
-	Required    bool          `json:"required"`    // If false, continue on failure
+	Layer       Layer             `json:"layer"`
+	Order       int               `json:"order"`
+	Description string            `json:"description"`
+	ActionType  string            `json:"action_type"` // restart, rollback, scale, drain, etc.
+	Target      string            `json:"target"`      // Resource identifier
+	WaitTime    time.Duration     `json:"wait_time"`   // Time to wait after this step
+	Required    bool              `json:"required"`    // If false, continue on failure
 	Metadata    map[string]string `json:"metadata,omitempty"`
 }
 
@@ -25,11 +25,11 @@ func (rs *RemediationStep) String() string {
 
 // HealthCheckpoint verifies layer health after remediation steps
 type HealthCheckpoint struct {
-	Layer      Layer         `json:"layer"`
-	AfterStep  int           `json:"after_step"`
-	Checks     []string      `json:"checks"`     // Health check descriptions
-	Timeout    time.Duration `json:"timeout"`    // Max time to wait for health
-	Required   bool          `json:"required"`   // If false, continue on failure
+	Layer     Layer         `json:"layer"`
+	AfterStep int           `json:"after_step"`
+	Checks    []string      `json:"checks"`   // Health check descriptions
+	Timeout   time.Duration `json:"timeout"`  // Max time to wait for health
+	Required  bool          `json:"required"` // If false, continue on failure
 }
 
 // String returns a human-readable representation of the checkpoint
@@ -40,15 +40,15 @@ func (hc *HealthCheckpoint) String() string {
 
 // RemediationPlan contains ordered steps with health checkpoints for multi-layer remediation
 type RemediationPlan struct {
-	ID            string               `json:"id"`
-	IssueID       string               `json:"issue_id"`
-	Layers        []Layer              `json:"layers"`
-	Steps         []RemediationStep    `json:"steps"`
-	Checkpoints   []HealthCheckpoint   `json:"checkpoints"`
-	RollbackSteps []RemediationStep    `json:"rollback_steps,omitempty"`
-	CreatedAt     time.Time            `json:"created_at"`
-	Status        string               `json:"status"` // pending, executing, completed, failed, rolled_back
-	CurrentStep   int                  `json:"current_step"`
+	ID            string             `json:"id"`
+	IssueID       string             `json:"issue_id"`
+	Layers        []Layer            `json:"layers"`
+	Steps         []RemediationStep  `json:"steps"`
+	Checkpoints   []HealthCheckpoint `json:"checkpoints"`
+	RollbackSteps []RemediationStep  `json:"rollback_steps,omitempty"`
+	CreatedAt     time.Time          `json:"created_at"`
+	Status        string             `json:"status"` // pending, executing, completed, failed, rolled_back
+	CurrentStep   int                `json:"current_step"`
 }
 
 // NewRemediationPlan creates a new remediation plan
@@ -67,12 +67,12 @@ func NewRemediationPlan(issueID string, layers []Layer) *RemediationPlan {
 }
 
 // AddStep adds a remediation step to the plan
-func (rp *RemediationPlan) AddStep(step RemediationStep) {
+func (rp *RemediationPlan) AddStep(step *RemediationStep) {
 	// Auto-assign order if not set
 	if step.Order == 0 {
 		step.Order = len(rp.Steps) + 1
 	}
-	rp.Steps = append(rp.Steps, step)
+	rp.Steps = append(rp.Steps, *step)
 }
 
 // AddCheckpoint adds a health checkpoint to the plan
@@ -81,8 +81,8 @@ func (rp *RemediationPlan) AddCheckpoint(checkpoint HealthCheckpoint) {
 }
 
 // AddRollbackStep adds a rollback step to the plan
-func (rp *RemediationPlan) AddRollbackStep(step RemediationStep) {
-	rp.RollbackSteps = append(rp.RollbackSteps, step)
+func (rp *RemediationPlan) AddRollbackStep(step *RemediationStep) {
+	rp.RollbackSteps = append(rp.RollbackSteps, *step)
 }
 
 // GetStepsForLayer returns all steps for a specific layer

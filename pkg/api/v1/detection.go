@@ -232,7 +232,9 @@ func (h *DetectionHandler) ClearCache(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(response)
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		h.log.WithError(err).Error("Failed to encode response")
+	}
 }
 
 // GetCacheStats handles GET /api/v1/detect/cache/stats
@@ -251,10 +253,12 @@ func (h *DetectionHandler) GetCacheStats(w http.ResponseWriter, r *http.Request)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]interface{}{
+	if err := json.NewEncoder(w).Encode(map[string]interface{}{
 		"success": true,
 		"data":    stats,
-	})
+	}); err != nil {
+		h.log.WithError(err).Error("Failed to encode cache stats response")
+	}
 }
 
 // Helper methods
@@ -296,5 +300,5 @@ func isNotFoundError(err error) bool {
 	errMsg := err.Error()
 	return len(errMsg) > 0 &&
 		(strings.Contains(errMsg, "not found") ||
-		 strings.Contains(errMsg, "NotFound"))
+			strings.Contains(errMsg, "NotFound"))
 }

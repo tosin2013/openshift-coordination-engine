@@ -72,14 +72,14 @@ type ApplicationStatus struct {
 
 // SyncStatus contains synchronization status
 type SyncStatus struct {
-	Status     string    `json:"status"` // "Synced", "OutOfSync"
-	Revision   string    `json:"revision"`
+	Status     string     `json:"status"` // "Synced", "OutOfSync"
+	Revision   string     `json:"revision"`
 	ComparedTo ComparedTo `json:"comparedTo"`
 }
 
 // ComparedTo contains comparison information
 type ComparedTo struct {
-	Source     ApplicationSource `json:"source"`
+	Source      ApplicationSource      `json:"source"`
 	Destination ApplicationDestination `json:"destination"`
 }
 
@@ -91,9 +91,9 @@ type HealthStatus struct {
 
 // SyncRequest represents a sync operation request
 type SyncRequest struct {
-	Revision  string        `json:"revision,omitempty"`
-	Prune     bool          `json:"prune"`
-	DryRun    bool          `json:"dryRun"`
+	Revision  string         `json:"revision,omitempty"`
+	Prune     bool           `json:"prune"`
+	DryRun    bool           `json:"dryRun"`
 	Resources []SyncResource `json:"resources,omitempty"`
 }
 
@@ -109,7 +109,7 @@ type SyncResource struct {
 func (c *ArgoCDClient) GetApplication(ctx context.Context, appName string) (*Application, error) {
 	url := fmt.Sprintf("%s/api/v1/applications/%s", c.baseURL, appName)
 
-	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", url, http.NoBody)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
@@ -120,10 +120,17 @@ func (c *ArgoCDClient) GetApplication(ctx context.Context, appName string) (*App
 	if err != nil {
 		return nil, fmt.Errorf("failed to get application: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			c.log.WithError(closeErr).Warn("Failed to close response body")
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK {
-		body, _ := io.ReadAll(resp.Body)
+		body, readErr := io.ReadAll(resp.Body)
+		if readErr != nil {
+			return nil, fmt.Errorf("ArgoCD API error (status %d), failed to read body: %w", resp.StatusCode, readErr)
+		}
 		return nil, fmt.Errorf("ArgoCD API error (status %d): %s", resp.StatusCode, string(body))
 	}
 
@@ -169,10 +176,17 @@ func (c *ArgoCDClient) SyncApplication(ctx context.Context, appName string, sync
 	if err != nil {
 		return fmt.Errorf("failed to sync application: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			c.log.WithError(closeErr).Warn("Failed to close response body")
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusAccepted {
-		body, _ := io.ReadAll(resp.Body)
+		body, readErr := io.ReadAll(resp.Body)
+		if readErr != nil {
+			return fmt.Errorf("ArgoCD sync failed (status %d), failed to read body: %w", resp.StatusCode, readErr)
+		}
 		return fmt.Errorf("ArgoCD sync failed (status %d): %s", resp.StatusCode, string(body))
 	}
 
@@ -231,7 +245,7 @@ func (c *ArgoCDClient) FindApplicationByResource(ctx context.Context, namespace,
 	// List all applications (simplified - in production, use label selectors)
 	url := fmt.Sprintf("%s/api/v1/applications", c.baseURL)
 
-	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", url, http.NoBody)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
@@ -242,10 +256,17 @@ func (c *ArgoCDClient) FindApplicationByResource(ctx context.Context, namespace,
 	if err != nil {
 		return nil, fmt.Errorf("failed to list applications: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			c.log.WithError(closeErr).Warn("Failed to close response body")
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK {
-		body, _ := io.ReadAll(resp.Body)
+		body, readErr := io.ReadAll(resp.Body)
+		if readErr != nil {
+			return nil, fmt.Errorf("ArgoCD API error (status %d), failed to read body: %w", resp.StatusCode, readErr)
+		}
 		return nil, fmt.Errorf("ArgoCD API error (status %d): %s", resp.StatusCode, string(body))
 	}
 
@@ -257,11 +278,11 @@ func (c *ArgoCDClient) FindApplicationByResource(ctx context.Context, namespace,
 	}
 
 	// Find application managing this resource
-	for _, app := range appList.Items {
-		if app.Spec.Destination.Namespace == namespace {
+	for i := range appList.Items {
+		if appList.Items[i].Spec.Destination.Namespace == namespace {
 			// In production, check managed resources more carefully
 			// For now, match by namespace
-			return &app, nil
+			return &appList.Items[i], nil
 		}
 	}
 
@@ -279,7 +300,7 @@ func (c *ArgoCDClient) setAuthHeaders(req *http.Request) {
 func (c *ArgoCDClient) HealthCheck(ctx context.Context) error {
 	url := fmt.Sprintf("%s/api/version", c.baseURL)
 
-	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", url, http.NoBody)
 	if err != nil {
 		return fmt.Errorf("failed to create request: %w", err)
 	}
@@ -290,7 +311,11 @@ func (c *ArgoCDClient) HealthCheck(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("ArgoCD health check failed: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			c.log.WithError(closeErr).Warn("Failed to close response body")
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("ArgoCD health check failed with status %d", resp.StatusCode)

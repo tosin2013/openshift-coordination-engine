@@ -29,10 +29,10 @@ func NewArgoCDRemediator(argocdClient *integrations.ArgoCDClient, log *logrus.Lo
 // Remediate performs ArgoCD-based remediation by triggering sync
 func (ar *ArgoCDRemediator) Remediate(ctx context.Context, deploymentInfo *models.DeploymentInfo, issue *models.Issue) error {
 	ar.log.WithFields(logrus.Fields{
-		"namespace":   issue.Namespace,
-		"resource":    issue.ResourceName,
-		"issue_type":  issue.Type,
-		"method":      "argocd",
+		"namespace":  issue.Namespace,
+		"resource":   issue.ResourceName,
+		"issue_type": issue.Type,
+		"method":     "argocd",
 	}).Info("Starting ArgoCD remediation")
 
 	// Find ArgoCD application managing this resource

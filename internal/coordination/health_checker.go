@@ -162,8 +162,14 @@ func (hc *HealthChecker) checkMCOStable(ctx context.Context) error {
 				continue
 			}
 
-			condType, _, _ := unstructured.NestedString(condition, "type")
-			condStatus, _, _ := unstructured.NestedString(condition, "status")
+			condType, found, err := unstructured.NestedString(condition, "type")
+			if err != nil || !found {
+				continue
+			}
+			condStatus, found, err := unstructured.NestedString(condition, "status")
+			if err != nil || !found {
+				continue
+			}
 
 			// Check if pool is degraded
 			if condType == "Degraded" && condStatus == "True" {
@@ -221,7 +227,7 @@ func (hc *HealthChecker) checkStorageAvailable(ctx context.Context) error {
 	}
 
 	hc.log.WithFields(logrus.Fields{
-		"storage_classes": len(storageClasses.Items),
+		"storage_classes":    len(storageClasses.Items),
 		"persistent_volumes": len(pvs.Items),
 	}).Debug("Storage is available")
 	return nil
@@ -271,8 +277,14 @@ func (hc *HealthChecker) checkOperatorsReady(ctx context.Context) error {
 				continue
 			}
 
-			condType, _, _ := unstructured.NestedString(condition, "type")
-			condStatus, _, _ := unstructured.NestedString(condition, "status")
+			condType, found, err := unstructured.NestedString(condition, "type")
+			if err != nil || !found {
+				continue
+			}
+			condStatus, found, err := unstructured.NestedString(condition, "status")
+			if err != nil || !found {
+				continue
+			}
 
 			if condType == "Degraded" && condStatus == "True" {
 				isDegraded = true
@@ -385,8 +397,8 @@ func (hc *HealthChecker) checkIngressAvailable(ctx context.Context) error {
 		if deployment.Status.AvailableReplicas < deployment.Status.Replicas {
 			unavailableDeployments++
 			hc.log.WithFields(logrus.Fields{
-				"deployment":        deployment.Name,
-				"desired_replicas":  deployment.Status.Replicas,
+				"deployment":         deployment.Name,
+				"desired_replicas":   deployment.Status.Replicas,
 				"available_replicas": deployment.Status.AvailableReplicas,
 			}).Warn("Ingress deployment is not fully available")
 		}

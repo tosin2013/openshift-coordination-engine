@@ -16,13 +16,13 @@ import (
 
 // HealthHandler handles health check requests
 type HealthHandler struct {
-	log           *logrus.Logger
-	k8sClient     *kubernetes.Clientset
-	rbacVerifier  *rbac.Verifier
-	mlServiceURL  string
-	version       string
-	startTime     time.Time
-	httpClient    *http.Client
+	log          *logrus.Logger
+	k8sClient    *kubernetes.Clientset
+	rbacVerifier *rbac.Verifier
+	mlServiceURL string
+	version      string
+	startTime    time.Time
+	httpClient   *http.Client
 }
 
 // NewHealthHandler creates a new health handler
@@ -49,11 +49,11 @@ func (h *HealthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	// Check Kubernetes connectivity
 	kubernetesHealth := h.checkKubernetes(ctx)
-	health.AddDependency("kubernetes", kubernetesHealth)
+	health.AddDependency("kubernetes", &kubernetesHealth)
 
 	// Check ML service connectivity (non-critical)
 	mlServiceHealth := h.checkMLService(ctx)
-	health.AddDependency("ml_service", mlServiceHealth)
+	health.AddDependency("ml_service", &mlServiceHealth)
 
 	// Check RBAC permissions
 	rbacStatus := h.checkRBAC(ctx)
@@ -135,7 +135,11 @@ func (h *HealthHandler) checkMLService(ctx context.Context) models.DependencyHea
 		dep.Message = fmt.Sprintf("Unreachable: %v", err)
 		h.log.WithError(err).Debug("ML service health check failed (non-critical)")
 	} else {
-		defer resp.Body.Close()
+		defer func() {
+			if closeErr := resp.Body.Close(); closeErr != nil {
+				h.log.WithError(closeErr).Warn("Failed to close ML service health check response body")
+			}
+		}()
 		if resp.StatusCode == http.StatusOK {
 			dep.Status = models.ComponentStatusOK
 			dep.Message = "Connected"

@@ -67,18 +67,18 @@ func (r *Resource) String() string {
 
 // LayeredIssue represents an issue that may span multiple layers
 type LayeredIssue struct {
-	ID                string              `json:"id"`
-	Description       string              `json:"description"`
-	AffectedLayers    []Layer             `json:"affected_layers"`
-	RootCauseLayer    Layer               `json:"root_cause_layer"`
+	ID                string               `json:"id"`
+	Description       string               `json:"description"`
+	AffectedLayers    []Layer              `json:"affected_layers"`
+	RootCauseLayer    Layer                `json:"root_cause_layer"`
 	ImpactedResources map[Layer][]Resource `json:"impacted_resources"`
-	DetectedAt        time.Time           `json:"detected_at"`
-	Severity          string              `json:"severity"` // critical, high, medium, low
+	DetectedAt        time.Time            `json:"detected_at"`
+	Severity          string               `json:"severity"` // critical, high, medium, low
 
 	// ML-enhanced fields (Phase 6)
 	MLPredictions     *MLLayerPredictions `json:"ml_predictions,omitempty"`
 	LayerConfidence   map[Layer]float64   `json:"layer_confidence,omitempty"`
-	DetectionMethod   string              `json:"detection_method"` // "keyword", "ml_enhanced", "ml_only"
+	DetectionMethod   string              `json:"detection_method"`             // "keyword", "ml_enhanced", "ml_only"
 	HistoricalPattern string              `json:"historical_pattern,omitempty"` // e.g., "infrastructure_cascading_failure"
 }
 
@@ -224,8 +224,8 @@ type MLLayerPredictions struct {
 // LayerPrediction contains ML prediction details for a specific layer
 type LayerPrediction struct {
 	Affected    bool     `json:"affected"`
-	Probability float64  `json:"probability"` // 0.0 to 1.0
-	Evidence    []string `json:"evidence,omitempty"`    // Supporting evidence (e.g., "high_disk_usage", "node_pressure")
+	Probability float64  `json:"probability"`        // 0.0 to 1.0
+	Evidence    []string `json:"evidence,omitempty"` // Supporting evidence (e.g., "high_disk_usage", "node_pressure")
 	IsRootCause bool     `json:"is_root_cause"`
 }
 

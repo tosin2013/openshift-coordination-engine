@@ -12,13 +12,13 @@ import (
 
 // MLLayerDetector enhances layer detection with ML predictions
 type MLLayerDetector struct {
-	baseDetector              *LayerDetector // Keyword-based detector (fallback)
-	mlClient                  *integrations.MLClient
-	enableML                  bool
-	timeout                   time.Duration
-	probabilityThreshold      float64 // Minimum probability to mark layer as affected
+	baseDetector                 *LayerDetector // Keyword-based detector (fallback)
+	mlClient                     *integrations.MLClient
+	enableML                     bool
+	timeout                      time.Duration
+	probabilityThreshold         float64 // Minimum probability to mark layer as affected
 	rootCauseConfidenceThreshold float64 // Minimum confidence to use ML-suggested root cause
-	log                       *logrus.Logger
+	log                          *logrus.Logger
 }
 
 // NewMLLayerDetector creates a new ML-enhanced layer detector
@@ -148,8 +148,8 @@ func (mld *MLLayerDetector) getMLPredictions(ctx context.Context, description st
 // parseMLResponse converts PatternAnalysisResponse to MLLayerPredictions
 func (mld *MLLayerDetector) parseMLResponse(resp *integrations.PatternAnalysisResponse, description string, resources []models.Resource) *models.MLLayerPredictions {
 	predictions := &models.MLLayerPredictions{
-		Confidence:  resp.Summary.Confidence,
-		PredictedAt: time.Now(),
+		Confidence:   resp.Summary.Confidence,
+		PredictedAt:  time.Now(),
 		AnalysisType: "pattern",
 	}
 
@@ -345,9 +345,9 @@ func (mld *MLLayerDetector) enhanceWithMLPredictions(issue *models.LayeredIssue,
 		}).Info("Using ML-suggested root cause")
 	} else {
 		mld.log.WithFields(logrus.Fields{
-			"ml_suggestion":   mlPred.RootCauseSuggestion,
-			"ml_confidence":   mlPred.Confidence,
-			"threshold":       mld.rootCauseConfidenceThreshold,
+			"ml_suggestion": mlPred.RootCauseSuggestion,
+			"ml_confidence": mlPred.Confidence,
+			"threshold":     mld.rootCauseConfidenceThreshold,
 			"using_keyword": issue.RootCauseLayer,
 		}).Debug("ML confidence below threshold, using keyword-based root cause")
 	}

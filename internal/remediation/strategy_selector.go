@@ -10,9 +10,9 @@ import (
 
 // StrategySelector routes remediation to the appropriate remediator based on deployment method
 type StrategySelector struct {
-	remediators      []Remediator
+	remediators        []Remediator
 	fallbackRemediator Remediator
-	log              *logrus.Logger
+	log                *logrus.Logger
 }
 
 // NewStrategySelector creates a new strategy selector

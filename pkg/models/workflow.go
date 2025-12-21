@@ -32,13 +32,13 @@ type Workflow struct {
 
 // WorkflowStep represents a single step in the workflow
 type WorkflowStep struct {
-	Order       int        `json:"order"`
-	Layer       string     `json:"layer,omitempty"`     // "infrastructure", "platform", "application"
-	Description string     `json:"description"`
-	Status      string     `json:"status"`              // "pending", "running", "completed", "failed"
-	StartedAt   *time.Time `json:"started_at,omitempty"`
-	CompletedAt *time.Time `json:"completed_at,omitempty"`
-	ErrorMessage string    `json:"error_message,omitempty"`
+	Order        int        `json:"order"`
+	Layer        string     `json:"layer,omitempty"` // "infrastructure", "platform", "application"
+	Description  string     `json:"description"`
+	Status       string     `json:"status"` // "pending", "running", "completed", "failed"
+	StartedAt    *time.Time `json:"started_at,omitempty"`
+	CompletedAt  *time.Time `json:"completed_at,omitempty"`
+	ErrorMessage string     `json:"error_message,omitempty"`
 }
 
 // Duration returns the workflow execution duration

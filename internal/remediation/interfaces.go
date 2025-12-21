@@ -20,8 +20,8 @@ type Remediator interface {
 
 // RemediationResult contains the outcome of remediation
 type RemediationResult struct {
-	Status   string `json:"status"`  // "success", "failed", "recommendation"
-	Method   string `json:"method"`  // Remediation method used
+	Status   string `json:"status"` // "success", "failed", "recommendation"
+	Method   string `json:"method"` // Remediation method used
 	Message  string `json:"message,omitempty"`
 	Duration string `json:"duration,omitempty"`
 }

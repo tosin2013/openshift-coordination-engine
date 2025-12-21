@@ -59,11 +59,11 @@ func RequestLogger(log *logrus.Logger) func(http.Handler) http.Handler {
 
 			// Log request start
 			log.WithFields(logrus.Fields{
-				"request_id": requestID,
-				"method":     r.Method,
-				"path":       r.URL.Path,
+				"request_id":  requestID,
+				"method":      r.Method,
+				"path":        r.URL.Path,
 				"remote_addr": r.RemoteAddr,
-				"user_agent": r.UserAgent(),
+				"user_agent":  r.UserAgent(),
 			}).Debug("Request started")
 
 			// Process request
@@ -74,13 +74,13 @@ func RequestLogger(log *logrus.Logger) func(http.Handler) http.Handler {
 
 			// Log request completion
 			logEntry := log.WithFields(logrus.Fields{
-				"request_id":   requestID,
-				"method":       r.Method,
-				"path":         r.URL.Path,
-				"status":       rw.statusCode,
-				"duration_ms":  duration.Milliseconds(),
+				"request_id":    requestID,
+				"method":        r.Method,
+				"path":          r.URL.Path,
+				"status":        rw.statusCode,
+				"duration_ms":   duration.Milliseconds(),
 				"bytes_written": rw.written,
-				"remote_addr":  r.RemoteAddr,
+				"remote_addr":   r.RemoteAddr,
 			})
 
 			// Log level based on status code

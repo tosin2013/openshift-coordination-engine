@@ -43,28 +43,28 @@ type TriggerRemediationRequest struct {
 
 // TriggerRemediationResponse represents the response for triggering remediation
 type TriggerRemediationResponse struct {
-	WorkflowID         string `json:"workflow_id"`
-	Status             string `json:"status"`
-	DeploymentMethod   string `json:"deployment_method"`
-	EstimatedDuration  string `json:"estimated_duration"`
+	WorkflowID        string `json:"workflow_id"`
+	Status            string `json:"status"`
+	DeploymentMethod  string `json:"deployment_method"`
+	EstimatedDuration string `json:"estimated_duration"`
 }
 
 // WorkflowResponse represents the response for getting workflow details
 type WorkflowResponse struct {
-	ID               string               `json:"id"`
-	IncidentID       string               `json:"incident_id"`
-	Status           string               `json:"status"`
-	DeploymentMethod string               `json:"deployment_method"`
-	Namespace        string               `json:"namespace"`
-	ResourceName     string               `json:"resource_name"`
-	ResourceKind     string               `json:"resource_kind"`
-	IssueType        string               `json:"issue_type"`
-	Remediator       string               `json:"remediator,omitempty"`
-	ErrorMessage     string               `json:"error_message,omitempty"`
-	CreatedAt        string               `json:"created_at"`
-	StartedAt        string               `json:"started_at,omitempty"`
-	CompletedAt      string               `json:"completed_at,omitempty"`
-	Duration         string               `json:"duration,omitempty"`
+	ID               string                `json:"id"`
+	IncidentID       string                `json:"incident_id"`
+	Status           string                `json:"status"`
+	DeploymentMethod string                `json:"deployment_method"`
+	Namespace        string                `json:"namespace"`
+	ResourceName     string                `json:"resource_name"`
+	ResourceKind     string                `json:"resource_kind"`
+	IssueType        string                `json:"issue_type"`
+	Remediator       string                `json:"remediator,omitempty"`
+	ErrorMessage     string                `json:"error_message,omitempty"`
+	CreatedAt        string                `json:"created_at"`
+	StartedAt        string                `json:"started_at,omitempty"`
+	CompletedAt      string                `json:"completed_at,omitempty"`
+	Duration         string                `json:"duration,omitempty"`
 	Steps            []models.WorkflowStep `json:"steps,omitempty"`
 }
 
@@ -135,7 +135,9 @@ func (h *RemediationHandler) TriggerRemediation(w http.ResponseWriter, r *http.R
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusAccepted)
-	json.NewEncoder(w).Encode(response)
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		h.log.WithError(err).Error("Failed to encode response")
+	}
 
 	h.log.WithFields(logrus.Fields{
 		"workflow_id": workflow.ID,
@@ -184,7 +186,9 @@ func (h *RemediationHandler) GetWorkflow(w http.ResponseWriter, r *http.Request)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(response)
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		h.log.WithError(err).Error("Failed to encode workflow response")
+	}
 
 	h.log.WithFields(logrus.Fields{
 		"workflow_id": workflowID,
@@ -233,7 +237,9 @@ func (h *RemediationHandler) ListIncidents(w http.ResponseWriter, r *http.Reques
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(response)
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		h.log.WithError(err).Error("Failed to encode incidents response")
+	}
 
 	h.log.WithField("count", len(incidents)).Info("Incidents listed successfully")
 }

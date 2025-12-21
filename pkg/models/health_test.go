@@ -31,7 +31,7 @@ func TestHealthResponse_AddDependency_Healthy(t *testing.T) {
 		CheckedAt: time.Now(),
 	}
 
-	health.AddDependency("database", dep)
+	health.AddDependency("database", &dep)
 
 	assert.Equal(t, HealthStatusHealthy, health.Status)
 	assert.Contains(t, health.Dependencies, "database")
@@ -48,7 +48,7 @@ func TestHealthResponse_AddDependency_Degraded(t *testing.T) {
 		CheckedAt: time.Now(),
 	}
 
-	health.AddDependency("cache", dep)
+	health.AddDependency("cache", &dep)
 
 	assert.Equal(t, HealthStatusDegraded, health.Status)
 }
@@ -63,7 +63,7 @@ func TestHealthResponse_AddDependency_CriticalDown(t *testing.T) {
 		CheckedAt: time.Now(),
 	}
 
-	health.AddDependency("kubernetes", dep)
+	health.AddDependency("kubernetes", &dep)
 
 	// Kubernetes is critical, so status should be unhealthy
 	assert.Equal(t, HealthStatusUnhealthy, health.Status)
@@ -79,7 +79,7 @@ func TestHealthResponse_AddDependency_NonCriticalDown(t *testing.T) {
 		CheckedAt: time.Now(),
 	}
 
-	health.AddDependency("ml_service", dep)
+	health.AddDependency("ml_service", &dep)
 
 	// ML service is non-critical, so status should be degraded
 	assert.Equal(t, HealthStatusDegraded, health.Status)
@@ -89,12 +89,12 @@ func TestHealthResponse_SetRBACStatus_OK(t *testing.T) {
 	health := NewHealthResponse("1.0.0", time.Now())
 
 	rbac := RBACStatus{
-		Status:           ComponentStatusOK,
-		PermissionsTotal: 37,
-		PermissionsOK:    37,
+		Status:            ComponentStatusOK,
+		PermissionsTotal:  37,
+		PermissionsOK:     37,
 		PermissionsFailed: 0,
-		CriticalOK:       true,
-		Message:          "All permissions verified",
+		CriticalOK:        true,
+		Message:           "All permissions verified",
 	}
 
 	health.SetRBACStatus(rbac)
@@ -107,12 +107,12 @@ func TestHealthResponse_SetRBACStatus_CriticalMissing(t *testing.T) {
 	health := NewHealthResponse("1.0.0", time.Now())
 
 	rbac := RBACStatus{
-		Status:           ComponentStatusDown,
-		PermissionsTotal: 37,
-		PermissionsOK:    34,
+		Status:            ComponentStatusDown,
+		PermissionsTotal:  37,
+		PermissionsOK:     34,
 		PermissionsFailed: 3,
-		CriticalOK:       false,
-		Message:          "Critical permissions missing",
+		CriticalOK:        false,
+		Message:           "Critical permissions missing",
 	}
 
 	health.SetRBACStatus(rbac)
@@ -125,12 +125,12 @@ func TestHealthResponse_SetRBACStatus_SomePermissionsFailed(t *testing.T) {
 	health := NewHealthResponse("1.0.0", time.Now())
 
 	rbac := RBACStatus{
-		Status:           ComponentStatusDegraded,
-		PermissionsTotal: 37,
-		PermissionsOK:    35,
+		Status:            ComponentStatusDegraded,
+		PermissionsTotal:  37,
+		PermissionsOK:     35,
 		PermissionsFailed: 2,
-		CriticalOK:       true,
-		Message:          "Some non-critical permissions missing",
+		CriticalOK:        true,
+		Message:           "Some non-critical permissions missing",
 	}
 
 	health.SetRBACStatus(rbac)

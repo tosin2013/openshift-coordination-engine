@@ -54,12 +54,12 @@ func TestMLClient_DetectAnomalies(t *testing.T) {
 				},
 			},
 			Summary: struct {
-				Total         int     `json:"total"`
+				Total          int     `json:"total"`
 				AnomaliesFound int     `json:"anomalies_found"`
 				HighSeverity   int     `json:"high_severity"`
 				Confidence     float64 `json:"confidence"`
 			}{
-				Total:         2,
+				Total:          2,
 				AnomaliesFound: 1,
 				HighSeverity:   1,
 				Confidence:     0.92,
@@ -114,21 +114,21 @@ func TestMLClient_Predict(t *testing.T) {
 		resp := PredictionResponse{
 			Predictions: []Prediction{
 				{
-					MetricName:  "cpu_usage",
+					MetricName:     "cpu_usage",
 					PredictedValue: 75.0,
-					Confidence:  0.85,
-					Timestamp:   time.Now().Add(1 * time.Hour),
-					Trend:       "increasing",
-					Risk:        "medium",
+					Confidence:     0.85,
+					Timestamp:      time.Now().Add(1 * time.Hour),
+					Trend:          "increasing",
+					Risk:           "medium",
 				},
 			},
 			Summary: struct {
-				TimeRange      string  `json:"time_range"`
-				MetricsCount   int     `json:"metrics_count"`
+				TimeRange         string  `json:"time_range"`
+				MetricsCount      int     `json:"metrics_count"`
 				OverallConfidence float64 `json:"overall_confidence"`
 			}{
-				TimeRange:      "1h",
-				MetricsCount:   1,
+				TimeRange:         "1h",
+				MetricsCount:      1,
 				OverallConfidence: 0.85,
 			},
 		}

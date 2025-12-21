@@ -20,8 +20,8 @@ type Config struct {
 	Namespace  string `json:"namespace"`
 
 	// External service URLs
-	MLServiceURL  string `json:"ml_service_url"`
-	ArgocdAPIURL  string `json:"argocd_api_url,omitempty"` // Optional, auto-detected
+	MLServiceURL string `json:"ml_service_url"`
+	ArgocdAPIURL string `json:"argocd_api_url,omitempty"` // Optional, auto-detected
 
 	// HTTP client configuration
 	HTTPTimeout time.Duration `json:"http_timeout"`
@@ -37,15 +37,15 @@ type Config struct {
 
 // Default configuration values
 const (
-	DefaultPort             = 8080
-	DefaultMetricsPort      = 9090
-	DefaultLogLevel         = "info"
-	DefaultNamespace        = "self-healing-platform"
-	DefaultMLServiceURL     = "http://aiops-ml-service:8080"
-	DefaultHTTPTimeout      = 30 * time.Second
-	DefaultKubernetesQPS    = 50.0
-	DefaultKubernetesBurst  = 100
-	DefaultEnableCORS       = false
+	DefaultPort            = 8080
+	DefaultMetricsPort     = 9090
+	DefaultLogLevel        = "info"
+	DefaultNamespace       = "self-healing-platform"
+	DefaultMLServiceURL    = "http://aiops-ml-service:8080"
+	DefaultHTTPTimeout     = 30 * time.Second
+	DefaultKubernetesQPS   = 50.0
+	DefaultKubernetesBurst = 100
+	DefaultEnableCORS      = false
 )
 
 // Valid log levels

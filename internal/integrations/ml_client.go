@@ -47,9 +47,9 @@ type AnomalyDetectionRequest struct {
 
 // MetricData represents a single metric data point
 type MetricData struct {
-	Name      string    `json:"name"`
-	Value     float64   `json:"value"`
-	Timestamp time.Time `json:"timestamp"`
+	Name      string            `json:"name"`
+	Value     float64           `json:"value"`
+	Timestamp time.Time         `json:"timestamp"`
 	Labels    map[string]string `json:"labels,omitempty"`
 }
 
@@ -57,7 +57,7 @@ type MetricData struct {
 type AnomalyDetectionResponse struct {
 	Anomalies []Anomaly `json:"anomalies"`
 	Summary   struct {
-		Total         int     `json:"total"`
+		Total          int     `json:"total"`
 		AnomaliesFound int     `json:"anomalies_found"`
 		HighSeverity   int     `json:"high_severity"`
 		Confidence     float64 `json:"confidence"`
@@ -87,20 +87,20 @@ type PredictionRequest struct {
 type PredictionResponse struct {
 	Predictions []Prediction `json:"predictions"`
 	Summary     struct {
-		TimeRange      string  `json:"time_range"`
-		MetricsCount   int     `json:"metrics_count"`
+		TimeRange         string  `json:"time_range"`
+		MetricsCount      int     `json:"metrics_count"`
 		OverallConfidence float64 `json:"overall_confidence"`
 	} `json:"summary"`
 }
 
 // Prediction represents a predicted metric value
 type Prediction struct {
-	MetricName  string    `json:"metric_name"`
-	PredictedValue float64 `json:"predicted_value"`
-	Confidence  float64   `json:"confidence"`
-	Timestamp   time.Time `json:"timestamp"`
-	Trend       string    `json:"trend,omitempty"` // increasing, decreasing, stable
-	Risk        string    `json:"risk,omitempty"`  // low, medium, high
+	MetricName     string    `json:"metric_name"`
+	PredictedValue float64   `json:"predicted_value"`
+	Confidence     float64   `json:"confidence"`
+	Timestamp      time.Time `json:"timestamp"`
+	Trend          string    `json:"trend,omitempty"` // increasing, decreasing, stable
+	Risk           string    `json:"risk,omitempty"`  // low, medium, high
 }
 
 // PatternAnalysisRequest represents a request to analyze historical patterns
@@ -125,7 +125,7 @@ type PatternAnalysisResponse struct {
 
 // Pattern represents a detected pattern
 type Pattern struct {
-	Type        string    `json:"type"`        // trend, seasonal, spike, correlation
+	Type        string    `json:"type"` // trend, seasonal, spike, correlation
 	Description string    `json:"description"`
 	Metrics     []string  `json:"metrics"`
 	Confidence  float64   `json:"confidence"`
@@ -143,10 +143,10 @@ func (c *MLClient) DetectAnomalies(ctx context.Context, req *AnomalyDetectionReq
 	}
 
 	c.log.WithFields(logrus.Fields{
-		"total_metrics":    req.Metrics,
-		"anomalies_found":  resp.Summary.AnomaliesFound,
-		"high_severity":    resp.Summary.HighSeverity,
-		"confidence":       resp.Summary.Confidence,
+		"total_metrics":   req.Metrics,
+		"anomalies_found": resp.Summary.AnomaliesFound,
+		"high_severity":   resp.Summary.HighSeverity,
+		"confidence":      resp.Summary.Confidence,
 	}).Debug("Anomaly detection completed")
 
 	return &resp, nil
@@ -181,10 +181,10 @@ func (c *MLClient) AnalyzePatterns(ctx context.Context, req *PatternAnalysisRequ
 	}
 
 	c.log.WithFields(logrus.Fields{
-		"metrics_count":   len(req.Metrics),
-		"patterns_found":  resp.Summary.PatternsFound,
-		"insights_count":  len(resp.Insights),
-		"confidence":      resp.Summary.Confidence,
+		"metrics_count":  len(req.Metrics),
+		"patterns_found": resp.Summary.PatternsFound,
+		"insights_count": len(resp.Insights),
+		"confidence":     resp.Summary.Confidence,
 	}).Debug("Pattern analysis completed")
 
 	return &resp, nil
@@ -203,7 +203,11 @@ func (c *MLClient) HealthCheck(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("health check request failed: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			c.log.WithError(closeErr).Warn("Failed to close response body")
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("ML service unhealthy: status %d", resp.StatusCode)
@@ -246,7 +250,11 @@ func (c *MLClient) doRequest(ctx context.Context, method, url string, reqBody, r
 		}).WithError(err).Error("ML service request failed")
 		return fmt.Errorf("request failed: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			c.log.WithError(closeErr).Warn("Failed to close response body")
+		}
+	}()
 
 	// Log request
 	c.log.WithFields(logrus.Fields{
@@ -258,7 +266,10 @@ func (c *MLClient) doRequest(ctx context.Context, method, url string, reqBody, r
 
 	// Check status code
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		bodyBytes, _ := io.ReadAll(resp.Body)
+		bodyBytes, readErr := io.ReadAll(resp.Body)
+		if readErr != nil {
+			return fmt.Errorf("unexpected status %d, failed to read body: %w", resp.StatusCode, readErr)
+		}
 		return fmt.Errorf("unexpected status %d: %s", resp.StatusCode, string(bodyBytes))
 	}
 

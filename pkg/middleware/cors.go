@@ -16,19 +16,19 @@ type CORSConfig struct {
 }
 
 // DefaultCORSConfig returns a permissive CORS configuration for development
-func DefaultCORSConfig() CORSConfig {
-	return CORSConfig{
-		AllowedOrigins: []string{"*"},
-		AllowedMethods: []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-		AllowedHeaders: []string{"Accept", "Authorization", "Content-Type", "X-Request-ID"},
-		ExposedHeaders: []string{"X-Request-ID"},
+func DefaultCORSConfig() *CORSConfig {
+	return &CORSConfig{
+		AllowedOrigins:   []string{"*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-Request-ID"},
+		ExposedHeaders:   []string{"X-Request-ID"},
 		AllowCredentials: false,
 		MaxAge:           3600,
 	}
 }
 
 // CORS creates a middleware that handles CORS
-func CORS(config CORSConfig) func(http.Handler) http.Handler {
+func CORS(config *CORSConfig) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			origin := r.Header.Get("Origin")

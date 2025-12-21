@@ -16,44 +16,44 @@ import (
 
 // CoordinationHandler handles multi-layer coordination requests
 type CoordinationHandler struct {
-	layerDetector          *coordination.LayerDetector
-	mlLayerDetector        *coordination.MLLayerDetector // Phase 6: ML-enhanced detector
-	planner                *coordination.MultiLayerPlanner
-	orchestrator           *coordination.MultiLayerOrchestrator
-	coordinationWorkflows  map[string]*CoordinationWorkflow
-	mu                     sync.RWMutex
-	log                    *logrus.Logger
-	enableMLDetection      bool // Phase 6: feature flag for ML detection
+	layerDetector         *coordination.LayerDetector
+	mlLayerDetector       *coordination.MLLayerDetector // Phase 6: ML-enhanced detector
+	planner               *coordination.MultiLayerPlanner
+	orchestrator          *coordination.MultiLayerOrchestrator
+	coordinationWorkflows map[string]*CoordinationWorkflow
+	mu                    sync.RWMutex
+	log                   *logrus.Logger
+	enableMLDetection     bool // Phase 6: feature flag for ML detection
 }
 
 // CoordinationWorkflow tracks multi-layer remediation workflows
 type CoordinationWorkflow struct {
-	ID               string                          `json:"id"`
-	IncidentID       string                          `json:"incident_id"`
-	Status           string                          `json:"status"` // pending, planning, executing, completed, failed
-	LayeredIssue     *models.LayeredIssue            `json:"layered_issue,omitempty"`
-	RemediationPlan  *models.RemediationPlan         `json:"remediation_plan,omitempty"`
-	ExecutionResult  *coordination.ExecutionResult   `json:"execution_result,omitempty"`
-	CreatedAt        time.Time                       `json:"created_at"`
-	StartedAt        *time.Time                      `json:"started_at,omitempty"`
-	CompletedAt      *time.Time                      `json:"completed_at,omitempty"`
-	ErrorMessage     string                          `json:"error_message,omitempty"`
+	ID              string                        `json:"id"`
+	IncidentID      string                        `json:"incident_id"`
+	Status          string                        `json:"status"` // pending, planning, executing, completed, failed
+	LayeredIssue    *models.LayeredIssue          `json:"layered_issue,omitempty"`
+	RemediationPlan *models.RemediationPlan       `json:"remediation_plan,omitempty"`
+	ExecutionResult *coordination.ExecutionResult `json:"execution_result,omitempty"`
+	CreatedAt       time.Time                     `json:"created_at"`
+	StartedAt       *time.Time                    `json:"started_at,omitempty"`
+	CompletedAt     *time.Time                    `json:"completed_at,omitempty"`
+	ErrorMessage    string                        `json:"error_message,omitempty"`
 }
 
 // TriggerMultiLayerRemediationRequest is the request format for triggering multi-layer remediation
 type TriggerMultiLayerRemediationRequest struct {
-	IncidentID   string             `json:"incident_id"`
-	Description  string             `json:"description"`
-	Resources    []models.Resource  `json:"resources"`
+	IncidentID  string            `json:"incident_id"`
+	Description string            `json:"description"`
+	Resources   []models.Resource `json:"resources"`
 }
 
 // TriggerMultiLayerRemediationResponse is the response format
 type TriggerMultiLayerRemediationResponse struct {
-	WorkflowID      string   `json:"workflow_id"`
-	Status          string   `json:"status"`
-	AffectedLayers  []models.Layer `json:"affected_layers"`
-	RootCauseLayer  models.Layer   `json:"root_cause_layer"`
-	EstimatedSteps  int      `json:"estimated_steps"`
+	WorkflowID     string         `json:"workflow_id"`
+	Status         string         `json:"status"`
+	AffectedLayers []models.Layer `json:"affected_layers"`
+	RootCauseLayer models.Layer   `json:"root_cause_layer"`
+	EstimatedSteps int            `json:"estimated_steps"`
 }
 
 // NewCoordinationHandler creates a new coordination handler
@@ -107,8 +107,8 @@ func (ch *CoordinationHandler) TriggerMultiLayerRemediation(w http.ResponseWrite
 	}
 
 	ch.log.WithFields(logrus.Fields{
-		"incident_id": req.IncidentID,
-		"resources":   len(req.Resources),
+		"incident_id":  req.IncidentID,
+		"resources":    len(req.Resources),
 		"ml_detection": ch.enableMLDetection,
 	}).Info("Triggering multi-layer remediation")
 
@@ -160,7 +160,9 @@ func (ch *CoordinationHandler) TriggerMultiLayerRemediation(w http.ResponseWrite
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusAccepted)
-	json.NewEncoder(w).Encode(response)
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		ch.log.WithError(err).Error("Failed to encode response")
+	}
 }
 
 // GetCoordinationWorkflow handles GET /api/v1/coordination/workflows/{id}
@@ -178,7 +180,9 @@ func (ch *CoordinationHandler) GetCoordinationWorkflow(w http.ResponseWriter, r 
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(workflow)
+	if err := json.NewEncoder(w).Encode(workflow); err != nil {
+		ch.log.WithError(err).Error("Failed to encode workflow response")
+	}
 }
 
 // ListCoordinationWorkflows handles GET /api/v1/coordination/workflows
@@ -196,7 +200,9 @@ func (ch *CoordinationHandler) ListCoordinationWorkflows(w http.ResponseWriter, 
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		ch.log.WithError(err).Error("Failed to encode workflows list response")
+	}
 }
 
 // executeCoordinationWorkflow executes the multi-layer remediation workflow

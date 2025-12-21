@@ -49,8 +49,8 @@ func (mlp *MultiLayerPlanner) GeneratePlan(ctx context.Context, issue *models.La
 		resources := issue.GetResourcesForLayer(layer)
 		layerSteps := mlp.generateStepsForLayer(layer, resources, &stepOrder)
 
-		for _, step := range layerSteps {
-			plan.AddStep(step)
+		for i := range layerSteps {
+			plan.AddStep(&layerSteps[i])
 		}
 	}
 
@@ -62,8 +62,8 @@ func (mlp *MultiLayerPlanner) GeneratePlan(ctx context.Context, issue *models.La
 
 	// Generate rollback steps (reverse order)
 	rollbackSteps := mlp.generateRollbackSteps(plan.Steps)
-	for _, rollbackStep := range rollbackSteps {
-		plan.AddRollbackStep(rollbackStep)
+	for i := range rollbackSteps {
+		plan.AddRollbackStep(&rollbackSteps[i])
 	}
 
 	mlp.log.WithFields(logrus.Fields{

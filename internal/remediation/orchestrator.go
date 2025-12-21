@@ -15,11 +15,11 @@ import (
 
 // Orchestrator manages remediation workflow execution
 type Orchestrator struct {
-	detector  *detector.Detector
+	detector   *detector.Detector
 	remediator Remediator
-	workflows map[string]*models.Workflow
-	mu        sync.RWMutex
-	log       *logrus.Logger
+	workflows  map[string]*models.Workflow
+	mu         sync.RWMutex
+	log        *logrus.Logger
 }
 
 // NewOrchestrator creates a new remediation orchestrator

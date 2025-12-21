@@ -6,8 +6,6 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
-	appsv1 "k8s.io/api/apps/v1"
-	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
@@ -100,10 +98,10 @@ func (mr *ManualRemediator) remediateImagePull(ctx context.Context, issue *model
 	}
 
 	// Log image information
-	for _, container := range pod.Spec.Containers {
+	for i := range pod.Spec.Containers {
 		mr.log.WithFields(logrus.Fields{
-			"container": container.Name,
-			"image":     container.Image,
+			"container": pod.Spec.Containers[i].Name,
+			"image":     pod.Spec.Containers[i].Image,
 		}).Info("Container image details")
 	}
 
@@ -125,11 +123,11 @@ func (mr *ManualRemediator) remediateOOM(ctx context.Context, issue *models.Issu
 	}
 
 	// Log current resource limits
-	for _, container := range pod.Spec.Containers {
+	for i := range pod.Spec.Containers {
 		mr.log.WithFields(logrus.Fields{
-			"container":      container.Name,
-			"memory_limit":   container.Resources.Limits.Memory().String(),
-			"memory_request": container.Resources.Requests.Memory().String(),
+			"container":      pod.Spec.Containers[i].Name,
+			"memory_limit":   pod.Spec.Containers[i].Resources.Limits.Memory().String(),
+			"memory_request": pod.Spec.Containers[i].Resources.Requests.Memory().String(),
 		}).Info("Current container resource limits")
 	}
 
@@ -225,44 +223,3 @@ func (mr *ManualRemediator) restartDeployment(ctx context.Context, issue *models
 // Helper methods for additional remediation scenarios
 
 // scaleDeployment scales a deployment to specified replicas
-func (mr *ManualRemediator) scaleDeployment(ctx context.Context, namespace, name string, replicas int32) error {
-	mr.log.WithFields(logrus.Fields{
-		"namespace":  namespace,
-		"deployment": name,
-		"replicas":   replicas,
-	}).Info("Scaling deployment")
-
-	deployment, err := mr.clientset.AppsV1().Deployments(namespace).Get(ctx, name, metav1.GetOptions{})
-	if err != nil {
-		return fmt.Errorf("failed to get deployment: %w", err)
-	}
-
-	deployment.Spec.Replicas = &replicas
-
-	_, err = mr.clientset.AppsV1().Deployments(namespace).Update(ctx, deployment, metav1.UpdateOptions{})
-	if err != nil {
-		return fmt.Errorf("failed to scale deployment: %w", err)
-	}
-
-	return nil
-}
-
-// checkDeploymentHealth verifies deployment health after remediation
-func (mr *ManualRemediator) checkDeploymentHealth(ctx context.Context, namespace, name string) (*appsv1.DeploymentStatus, error) {
-	deployment, err := mr.clientset.AppsV1().Deployments(namespace).Get(ctx, name, metav1.GetOptions{})
-	if err != nil {
-		return nil, fmt.Errorf("failed to get deployment: %w", err)
-	}
-
-	return &deployment.Status, nil
-}
-
-// getPodStatus gets the current status of a pod
-func (mr *ManualRemediator) getPodStatus(ctx context.Context, namespace, name string) (*corev1.PodStatus, error) {
-	pod, err := mr.clientset.CoreV1().Pods(namespace).Get(ctx, name, metav1.GetOptions{})
-	if err != nil {
-		return nil, fmt.Errorf("failed to get pod: %w", err)
-	}
-
-	return &pod.Status, nil
-}

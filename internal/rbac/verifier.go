@@ -101,9 +101,9 @@ func RequiredPermissions(namespace string) []Permission {
 }
 
 // VerifyPermission checks if the current ServiceAccount has a specific permission
-func (v *Verifier) VerifyPermission(ctx context.Context, perm Permission) PermissionCheckResult {
+func (v *Verifier) VerifyPermission(ctx context.Context, perm *Permission) PermissionCheckResult {
 	result := PermissionCheckResult{
-		Permission: perm,
+		Permission: *perm,
 	}
 
 	// Create SelfSubjectAccessReview
@@ -153,8 +153,8 @@ func (v *Verifier) VerifyAllPermissions(ctx context.Context) ([]PermissionCheckR
 
 	v.log.WithField("total_checks", len(permissions)).Info("Starting RBAC permission verification")
 
-	for _, perm := range permissions {
-		result := v.VerifyPermission(ctx, perm)
+	for i := range permissions {
+		result := v.VerifyPermission(ctx, &permissions[i])
 		results = append(results, result)
 	}
 
@@ -180,10 +180,10 @@ func (v *Verifier) CheckCriticalPermissions(ctx context.Context) error {
 	v.log.WithField("critical_checks", len(criticalPerms)).Info("Verifying critical RBAC permissions")
 
 	failedPerms := []string{}
-	for _, perm := range criticalPerms {
-		result := v.VerifyPermission(ctx, perm)
+	for i := range criticalPerms {
+		result := v.VerifyPermission(ctx, &criticalPerms[i])
 		if !result.Allowed {
-			failedPerms = append(failedPerms, fmt.Sprintf("%s/%s:%s", perm.APIGroup, perm.Resource, perm.Verb))
+			failedPerms = append(failedPerms, fmt.Sprintf("%s/%s:%s", criticalPerms[i].APIGroup, criticalPerms[i].Resource, criticalPerms[i].Verb))
 		}
 	}
 

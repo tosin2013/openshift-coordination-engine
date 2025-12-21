@@ -26,7 +26,9 @@ func Recovery(log *logrus.Logger) func(http.Handler) http.Handler {
 					// Return 500 Internal Server Error
 					w.Header().Set("Content-Type", "application/json")
 					w.WriteHeader(http.StatusInternalServerError)
-					w.Write([]byte(`{"error":"Internal server error","message":"An unexpected error occurred"}`))
+					if _, err := w.Write([]byte(`{"error":"Internal server error","message":"An unexpected error occurred"}`)); err != nil {
+						log.WithError(err).Error("Failed to write panic recovery response")
+					}
 				}
 			}()
 
