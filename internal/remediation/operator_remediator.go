@@ -7,12 +7,13 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
-	"github.com/tosin2013/openshift-coordination-engine/pkg/models"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
+
+	"github.com/tosin2013/openshift-coordination-engine/pkg/models"
 )
 
 // OperatorRemediator handles operator-managed application remediation

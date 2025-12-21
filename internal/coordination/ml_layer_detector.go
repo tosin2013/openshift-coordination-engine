@@ -134,7 +134,7 @@ func (mld *MLLayerDetector) getMLPredictions(ctx context.Context, description st
 	}
 
 	// Parse response into ML predictions
-	predictions := mld.parseMLResponse(resp, description, resources)
+	predictions := mld.parseMLResponse(resp, resources)
 
 	mld.log.WithFields(logrus.Fields{
 		"ml_confidence":   predictions.Confidence,
@@ -146,7 +146,7 @@ func (mld *MLLayerDetector) getMLPredictions(ctx context.Context, description st
 }
 
 // parseMLResponse converts PatternAnalysisResponse to MLLayerPredictions
-func (mld *MLLayerDetector) parseMLResponse(resp *integrations.PatternAnalysisResponse, description string, resources []models.Resource) *models.MLLayerPredictions {
+func (mld *MLLayerDetector) parseMLResponse(resp *integrations.PatternAnalysisResponse, resources []models.Resource) *models.MLLayerPredictions {
 	predictions := &models.MLLayerPredictions{
 		Confidence:   resp.Summary.Confidence,
 		PredictedAt:  time.Now(),
@@ -158,7 +158,7 @@ func (mld *MLLayerDetector) parseMLResponse(resp *integrations.PatternAnalysisRe
 	// For now, we use heuristics based on pattern type and confidence
 
 	// Check for infrastructure patterns
-	infraProb := mld.calculateLayerProbability(resp, models.LayerInfrastructure, description, resources)
+	infraProb := mld.calculateLayerProbability(resp, models.LayerInfrastructure, resources)
 	if infraProb > 0.0 {
 		predictions.Infrastructure = &models.LayerPrediction{
 			Affected:    infraProb > mld.probabilityThreshold,
@@ -169,7 +169,7 @@ func (mld *MLLayerDetector) parseMLResponse(resp *integrations.PatternAnalysisRe
 	}
 
 	// Check for platform patterns
-	platformProb := mld.calculateLayerProbability(resp, models.LayerPlatform, description, resources)
+	platformProb := mld.calculateLayerProbability(resp, models.LayerPlatform, resources)
 	if platformProb > 0.0 {
 		predictions.Platform = &models.LayerPrediction{
 			Affected:    platformProb > mld.probabilityThreshold,
@@ -180,7 +180,7 @@ func (mld *MLLayerDetector) parseMLResponse(resp *integrations.PatternAnalysisRe
 	}
 
 	// Check for application patterns
-	appProb := mld.calculateLayerProbability(resp, models.LayerApplication, description, resources)
+	appProb := mld.calculateLayerProbability(resp, models.LayerApplication, resources)
 	if appProb > 0.0 {
 		predictions.Application = &models.LayerPrediction{
 			Affected:    appProb > mld.probabilityThreshold,
@@ -213,7 +213,7 @@ func (mld *MLLayerDetector) parseMLResponse(resp *integrations.PatternAnalysisRe
 }
 
 // calculateLayerProbability estimates layer probability from pattern analysis
-func (mld *MLLayerDetector) calculateLayerProbability(resp *integrations.PatternAnalysisResponse, layer models.Layer, description string, resources []models.Resource) float64 {
+func (mld *MLLayerDetector) calculateLayerProbability(resp *integrations.PatternAnalysisResponse, layer models.Layer, resources []models.Resource) float64 {
 	// Use pattern confidence as base probability
 	baseProbability := resp.Summary.Confidence
 

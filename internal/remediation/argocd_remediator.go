@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
+
 	"github.com/tosin2013/openshift-coordination-engine/internal/integrations"
 	"github.com/tosin2013/openshift-coordination-engine/pkg/models"
 )

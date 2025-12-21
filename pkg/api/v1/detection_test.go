@@ -18,7 +18,7 @@ import (
 	"k8s.io/client-go/kubernetes/fake"
 )
 
-func setupDetectionHandler() (*DetectionHandler, *mux.Router) {
+func setupDetectionHandler() *mux.Router { //nolint:unparam // returns router for test setup
 	log := logrus.New()
 	log.SetLevel(logrus.ErrorLevel)
 
@@ -60,7 +60,7 @@ func setupDetectionHandler() (*DetectionHandler, *mux.Router) {
 	router := mux.NewRouter()
 	handler.RegisterRoutes(router)
 
-	return handler, router
+	return router
 }
 
 func TestNewDetectionHandler(t *testing.T) {
@@ -76,7 +76,7 @@ func TestNewDetectionHandler(t *testing.T) {
 }
 
 func TestDetectDeployment_Success(t *testing.T) {
-	_, router := setupDetectionHandler()
+	router := setupDetectionHandler()
 
 	req := httptest.NewRequest("GET", "/api/v1/detect/deployment/default/test-app", nil)
 	w := httptest.NewRecorder()
@@ -97,7 +97,7 @@ func TestDetectDeployment_Success(t *testing.T) {
 }
 
 func TestDetectDeployment_NotFound(t *testing.T) {
-	_, router := setupDetectionHandler()
+	router := setupDetectionHandler()
 
 	req := httptest.NewRequest("GET", "/api/v1/detect/deployment/default/nonexistent", nil)
 	w := httptest.NewRecorder()
@@ -115,7 +115,7 @@ func TestDetectDeployment_NotFound(t *testing.T) {
 }
 
 func TestDetectStatefulSet_Success(t *testing.T) {
-	_, router := setupDetectionHandler()
+	router := setupDetectionHandler()
 
 	req := httptest.NewRequest("GET", "/api/v1/detect/statefulset/default/test-sts", nil)
 	w := httptest.NewRecorder()
@@ -136,7 +136,7 @@ func TestDetectStatefulSet_Success(t *testing.T) {
 }
 
 func TestDetectStatefulSet_NotFound(t *testing.T) {
-	_, router := setupDetectionHandler()
+	router := setupDetectionHandler()
 
 	req := httptest.NewRequest("GET", "/api/v1/detect/statefulset/default/nonexistent", nil)
 	w := httptest.NewRecorder()
@@ -154,7 +154,7 @@ func TestDetectStatefulSet_NotFound(t *testing.T) {
 }
 
 func TestDetectDaemonSet_Success(t *testing.T) {
-	_, router := setupDetectionHandler()
+	router := setupDetectionHandler()
 
 	req := httptest.NewRequest("GET", "/api/v1/detect/daemonset/kube-system/test-ds", nil)
 	w := httptest.NewRecorder()
@@ -175,7 +175,7 @@ func TestDetectDaemonSet_Success(t *testing.T) {
 }
 
 func TestDetectDaemonSet_NotFound(t *testing.T) {
-	_, router := setupDetectionHandler()
+	router := setupDetectionHandler()
 
 	req := httptest.NewRequest("GET", "/api/v1/detect/daemonset/default/nonexistent", nil)
 	w := httptest.NewRecorder()
@@ -193,7 +193,7 @@ func TestDetectDaemonSet_NotFound(t *testing.T) {
 }
 
 func TestClearCache_Success(t *testing.T) {
-	_, router := setupDetectionHandler()
+	router := setupDetectionHandler()
 
 	// First, populate the cache
 	req1 := httptest.NewRequest("GET", "/api/v1/detect/deployment/default/test-app", nil)
@@ -238,7 +238,7 @@ func TestClearCache_Success(t *testing.T) {
 }
 
 func TestGetCacheStats_Success(t *testing.T) {
-	_, router := setupDetectionHandler()
+	router := setupDetectionHandler()
 
 	req := httptest.NewRequest("GET", "/api/v1/detect/cache/stats", nil)
 	w := httptest.NewRecorder()

@@ -12,6 +12,11 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
+	"k8s.io/client-go/dynamic"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
+
 	"github.com/tosin2013/openshift-coordination-engine/internal/coordination"
 	"github.com/tosin2013/openshift-coordination-engine/internal/detector"
 	"github.com/tosin2013/openshift-coordination-engine/internal/integrations"
@@ -20,10 +25,6 @@ import (
 	v1 "github.com/tosin2013/openshift-coordination-engine/pkg/api/v1"
 	"github.com/tosin2013/openshift-coordination-engine/pkg/config"
 	"github.com/tosin2013/openshift-coordination-engine/pkg/middleware"
-	"k8s.io/client-go/dynamic"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
 )
 
 var (

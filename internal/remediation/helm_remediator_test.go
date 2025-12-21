@@ -1,11 +1,13 @@
 package remediation
 
 import (
+	"context"
 	"testing"
 	"time"
 
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
+
 	"github.com/tosin2013/openshift-coordination-engine/pkg/models"
 )
 
@@ -134,7 +136,7 @@ func TestHelmRemediator_RemediateValidation(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := remediator.Remediate(nil, tt.deploymentInfo, tt.issue)
+			err := remediator.Remediate(context.TODO(), tt.deploymentInfo, tt.issue)
 			if tt.expectError {
 				assert.Error(t, err)
 				if tt.errorContains != "" {

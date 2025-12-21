@@ -8,10 +8,11 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/tosin2013/openshift-coordination-engine/pkg/models"
 	appsv1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
+
+	"github.com/tosin2013/openshift-coordination-engine/pkg/models"
 )
 
 func TestNewDeploymentDetector(t *testing.T) {

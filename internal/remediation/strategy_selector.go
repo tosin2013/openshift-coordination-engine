@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/sirupsen/logrus"
+
 	"github.com/tosin2013/openshift-coordination-engine/pkg/models"
 )
 

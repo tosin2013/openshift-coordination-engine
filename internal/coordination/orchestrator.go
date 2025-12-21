@@ -381,6 +381,8 @@ func (mlo *MultiLayerOrchestrator) verifyCheckpoint(ctx context.Context, checkpo
 }
 
 // rollbackSteps executes rollback in reverse order
+//
+//nolint:unparam // error return kept for future error aggregation
 func (mlo *MultiLayerOrchestrator) rollbackSteps(ctx context.Context, steps []models.RemediationStep) error {
 	mlo.log.WithField("steps", len(steps)).Warn("Starting coordinated rollback")
 

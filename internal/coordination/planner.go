@@ -263,7 +263,7 @@ func (mlp *MultiLayerPlanner) generateApplicationSteps(resources []models.Resour
 
 // generateCheckpoints creates health checkpoints after each layer's remediation
 func (mlp *MultiLayerPlanner) generateCheckpoints(layers []models.Layer, steps []models.RemediationStep) []models.HealthCheckpoint {
-	var checkpoints []models.HealthCheckpoint
+	checkpoints := make([]models.HealthCheckpoint, 0, len(layers))
 
 	// Find the last step for each layer
 	lastStepPerLayer := make(map[models.Layer]int)

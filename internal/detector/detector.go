@@ -4,8 +4,9 @@ import (
 	"context"
 
 	"github.com/sirupsen/logrus"
-	"github.com/tosin2013/openshift-coordination-engine/pkg/models"
 	"k8s.io/client-go/kubernetes"
+
+	"github.com/tosin2013/openshift-coordination-engine/pkg/models"
 )
 
 // Detector is an alias for DeploymentDetector for easier imports

@@ -8,9 +8,10 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
-	"github.com/tosin2013/openshift-coordination-engine/pkg/models"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+
+	"github.com/tosin2013/openshift-coordination-engine/pkg/models"
 )
 
 // Detection constants (as defined in ADR-041)
