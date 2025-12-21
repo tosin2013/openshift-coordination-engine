@@ -127,7 +127,7 @@ var (
 		[]string{"layer"},
 	)
 
-	// ML-enhanced detection metrics (Phase 6)
+	// MLLayerDetectionTotal tracks ML-enhanced layer detection attempts (Phase 6)
 	MLLayerDetectionTotal = promauto.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "coordination_engine_ml_layer_detection_total",
@@ -136,6 +136,7 @@ var (
 		[]string{"success", "ml_available"},
 	)
 
+	// MLLayerConfidenceHist records ML prediction confidence for layer detection
 	MLLayerConfidenceHist = promauto.NewHistogramVec(
 		prometheus.HistogramOpts{
 			Name:    "coordination_engine_ml_layer_confidence",

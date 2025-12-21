@@ -1,3 +1,4 @@
+// Package models defines data structures for deployment detection and remediation.
 package models
 
 import (

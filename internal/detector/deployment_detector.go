@@ -122,6 +122,8 @@ func (d *DeploymentDetector) DetectDeploymentMethod(ctx context.Context, namespa
 
 // detectFromMetadata detects deployment method from annotations and labels
 // This is the core detection logic that implements the priority-based strategy from ADR-041
+//
+//nolint:gocyclo // complexity acceptable for priority-based detection logic
 func (d *DeploymentDetector) detectFromMetadata(
 	annotations, labels map[string]string,
 	namespace, resourceName, resourceKind string,

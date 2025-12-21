@@ -172,6 +172,7 @@ func (hr *HelmRemediator) rollbackRelease(ctx context.Context, releaseName, name
 	timeoutCtx, cancel := context.WithTimeout(ctx, hr.helmTimeout)
 	defer cancel()
 
+	//nolint:gosec // helm command with controlled inputs from deployment metadata
 	cmd := exec.CommandContext(timeoutCtx, "helm", "rollback", releaseName,
 		"-n", namespace,
 		"--wait",
@@ -213,6 +214,7 @@ func (hr *HelmRemediator) upgradeRelease(ctx context.Context, releaseName, names
 	// --reuse-values: Reuse the last release's values
 	// --atomic: If upgrade fails, rollback automatically
 	// --wait: Wait for resources to be ready
+	//nolint:gosec // helm command with controlled inputs from deployment metadata
 	cmd := exec.CommandContext(timeoutCtx, "helm", "upgrade", releaseName, chart,
 		"-n", namespace,
 		"--reuse-values",

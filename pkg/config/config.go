@@ -1,3 +1,4 @@
+// Package config provides configuration management for the coordination engine.
 package config
 
 import (
@@ -84,6 +85,8 @@ func Load() (*Config, error) {
 }
 
 // Validate validates the configuration
+//
+//nolint:gocyclo // complexity acceptable for comprehensive config validation
 func (c *Config) Validate() error {
 	var errors []string
 

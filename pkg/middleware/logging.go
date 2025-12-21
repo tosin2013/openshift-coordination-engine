@@ -17,6 +17,7 @@ const (
 // RequestIDKey is the context key for request ID
 type contextKey string
 
+// RequestIDKey is the context key for storing request IDs
 const RequestIDKey contextKey = "request_id"
 
 // responseWriter wraps http.ResponseWriter to capture status code

@@ -235,6 +235,7 @@ func (hc *HealthChecker) checkStorageAvailable(ctx context.Context) error {
 
 // Platform checks
 
+//nolint:gocyclo // complexity acceptable for comprehensive operator health checks
 func (hc *HealthChecker) checkOperatorsReady(ctx context.Context) error {
 	hc.log.Debug("Checking ClusterOperator status")
 

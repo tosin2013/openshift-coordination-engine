@@ -19,6 +19,8 @@ type Remediator interface {
 }
 
 // RemediationResult contains the outcome of remediation
+//
+//nolint:revive // intentional naming for clarity in external package usage
 type RemediationResult struct {
 	Status   string `json:"status"` // "success", "failed", "recommendation"
 	Method   string `json:"method"` // Remediation method used

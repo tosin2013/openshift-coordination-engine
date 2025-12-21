@@ -5,6 +5,7 @@ import "time"
 // WorkflowStatus represents the current state of a remediation workflow
 type WorkflowStatus string
 
+// Workflow status constants
 const (
 	WorkflowStatusPending   WorkflowStatus = "pending"
 	WorkflowStatusRunning   WorkflowStatus = "in_progress"

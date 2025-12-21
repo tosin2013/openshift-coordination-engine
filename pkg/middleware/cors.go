@@ -1,3 +1,4 @@
+// Package middleware provides HTTP middleware for the coordination engine API.
 package middleware
 
 import (
