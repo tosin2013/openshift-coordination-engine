@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -33,7 +34,10 @@ func (rw *responseWriter) WriteHeader(code int) {
 func (rw *responseWriter) Write(b []byte) (int, error) {
 	n, err := rw.ResponseWriter.Write(b)
 	rw.written += int64(n)
-	return n, err
+	if err != nil {
+		return n, fmt.Errorf("failed to write response: %w", err)
+	}
+	return n, nil
 }
 
 // RequestLogger creates a middleware that logs HTTP requests

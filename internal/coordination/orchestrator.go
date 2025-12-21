@@ -123,7 +123,7 @@ func (mlo *MultiLayerOrchestrator) ExecutePlan(ctx context.Context, plan *models
 					Reason:        "context cancelled",
 					ExecutedSteps: len(executedSteps),
 					CompletedAt:   time.Now(),
-				}, ctx.Err()
+				}, fmt.Errorf("plan execution cancelled: %w", ctx.Err())
 			}
 		}
 
@@ -314,7 +314,10 @@ func (mlo *MultiLayerOrchestrator) executeApplicationStep(ctx context.Context, s
 		"deployment_method": deploymentInfo.Method,
 	}).Info("Executing application remediation")
 
-	return mlo.strategySelector.Remediate(ctx, deploymentInfo, issue)
+	if err := mlo.strategySelector.Remediate(ctx, deploymentInfo, issue); err != nil {
+		return fmt.Errorf("application remediation failed: %w", err)
+	}
+	return nil
 }
 
 // parseTarget parses "namespace/name" format

@@ -200,7 +200,11 @@ func (o *Orchestrator) detectDeploymentMethod(ctx context.Context, issue *models
 		kind = "Deployment"
 	}
 
-	return o.detector.DetectByKind(ctx, issue.Namespace, issue.ResourceName, kind)
+	deploymentInfo, err := o.detector.DetectByKind(ctx, issue.Namespace, issue.ResourceName, kind)
+	if err != nil {
+		return nil, fmt.Errorf("failed to detect deployment info: %w", err)
+	}
+	return deploymentInfo, nil
 }
 
 // updateWorkflowStatus updates the workflow status

@@ -209,7 +209,7 @@ func (c *ArgoCDClient) WaitForSync(ctx context.Context, appName string, timeout 
 	for {
 		select {
 		case <-ctx.Done():
-			return ctx.Err()
+			return fmt.Errorf("context cancelled while waiting for sync: %w", ctx.Err())
 		case <-ticker.C:
 			if time.Now().After(deadline) {
 				return fmt.Errorf("timeout waiting for sync after %s", timeout)

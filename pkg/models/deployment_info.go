@@ -150,7 +150,11 @@ func (d *DeploymentInfo) String() string {
 
 // ToJSON serializes the DeploymentInfo to JSON
 func (d *DeploymentInfo) ToJSON() ([]byte, error) {
-	return json.Marshal(d)
+	data, err := json.Marshal(d)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal deployment info: %w", err)
+	}
+	return data, nil
 }
 
 // FromJSON deserializes DeploymentInfo from JSON
