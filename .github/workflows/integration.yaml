@@ -80,7 +80,7 @@ jobs:
       - name: Test ArgoCD integration
         run: |
           if ls ./internal/integrations/argocd_*_test.go 1> /dev/null 2>&1; then
-            go test -v -tags=integration -timeout=10m ./internal/integrations/argocd_*_test.go
+            go test -v -tags=integration -timeout=10m -run "TestArgoCD" ./internal/integrations
           else
             echo "No ArgoCD integration tests found, skipping..."
           fi
@@ -111,7 +111,7 @@ jobs:
       - name: Test Helm integration
         run: |
           if ls ./internal/remediation/helm_*_test.go 1> /dev/null 2>&1; then
-            go test -v -tags=integration -timeout=10m ./internal/remediation/helm_*_test.go
+            go test -v -tags=integration -timeout=10m -run "TestHelm" ./internal/remediation
           else
             echo "No Helm integration tests found, skipping..."
           fi
