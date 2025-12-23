@@ -196,8 +196,12 @@ func main() {
 
 	// Start metrics server
 	metricsServer := &http.Server{
-		Addr:    fmt.Sprintf(":%d", cfg.MetricsPort),
-		Handler: metricsRouter,
+		Addr:              fmt.Sprintf(":%d", cfg.MetricsPort),
+		Handler:           metricsRouter,
+		ReadHeaderTimeout: 10 * time.Second,
+		ReadTimeout:       15 * time.Second,
+		WriteTimeout:      15 * time.Second,
+		IdleTimeout:       60 * time.Second,
 	}
 
 	go func() {
