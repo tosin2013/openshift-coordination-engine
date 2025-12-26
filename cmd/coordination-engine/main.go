@@ -95,6 +95,10 @@ func main() {
 
 	log.WithField("ml_service_url", cfg.MLServiceURL).Info("ML service client initialized")
 
+	// Initialize MCO client for infrastructure layer monitoring
+	mcoClient := integrations.NewMCOClient(k8sClients.DynamicClient, log)
+	log.Info("MCO client initialized for infrastructure layer monitoring")
+
 	// Initialize deployment detector
 	deploymentDetector := detector.NewDetector(k8sClients.Clientset, log)
 	log.Info("Deployment detector initialized")
@@ -166,6 +170,8 @@ func main() {
 
 	// Create API handlers
 	healthHandler := v1.NewHealthHandler(log, k8sClients.Clientset, rbacVerifier, cfg.MLServiceURL, Version, startTime)
+	// TODO: Add MCO health monitoring to health handler in future enhancement
+	_ = mcoClient // MCO client available for infrastructure layer operations
 	remediationHandler := v1.NewRemediationHandler(orchestrator, log)
 	detectionHandler := v1.NewDetectionHandler(deploymentDetector, log)
 	coordinationHandler := v1.NewCoordinationHandler(layerDetector, multiLayerPlanner, multiLayerOrchestrator, log)
